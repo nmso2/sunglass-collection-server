@@ -22,12 +22,28 @@ async function run() {
         const sunglassCollection = database.collection('sunglass');
         const purchaseCollection = database.collection('purchaseSunglass');
         const usersCollection = database.collection("users");
+        const reviewCollection = database.collection("review");
 
         // POST API to add user
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
             res.json(result);
+        });
+
+
+        // GET API to get all user
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+
+        // GET API (Get all sunglasses)
+        app.get('/sunglass', async (req, res) => {
+            const cursor = sunglassCollection.find({});
+            const sunglass = await cursor.toArray();
+            res.send(sunglass);
         });
 
 
@@ -73,12 +89,14 @@ async function run() {
             res.json(result);
         });
 
+
         // GET API (Get all sunglasses)
         app.get('/sunglass', async (req, res) => {
             const cursor = sunglassCollection.find({});
             const sunglass = await cursor.toArray();
             res.send(sunglass);
-        })
+        });
+
 
         // GET API (Get single sunglass)
         app.get('/sunglass/:id', async (req, res) => {
@@ -86,7 +104,22 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const sunglass = await sunglassCollection.findOne(query);
             res.json(sunglass);
-        })
+        });
+
+
+        // POST API to add review
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.json(result);
+        });
+
+        // GET API (Get all sunglasses)
+        app.get('/review', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const review = await cursor.toArray();
+            res.send(review);
+        });
 
         // POST API to add Purchase order
         app.post('/purchaseSunglass', async (req, res) => {
@@ -123,12 +156,12 @@ async function run() {
         // UPDATE API
         app.put('/purchaseSunglass/:id', async (req, res) => {
             const id = req.params.id;
-            const updatedPlan = req.body;
+            const updatedOrder = req.body;
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    confirmed: updatedPlan.confirmed
+                    confirmed: updatedOrder.confirmed
                 },
             };
             const result = await purchaseCollection.updateOne(filter, updateDoc, options)
